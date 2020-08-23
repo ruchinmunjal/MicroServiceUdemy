@@ -112,8 +112,8 @@ namespace Catalog.Api.Controllers
             return BadRequest(ErrorMessage);
         }
 
-        [HttpDelete("{id}")]
-        [Route("/catalog/{id}")]
+        [HttpDelete]
+        
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -129,18 +129,6 @@ namespace Catalog.Api.Controllers
 
             return BadRequest(ErrorMessage);
         }
-        //[HttpGet("{id:length(24)}",Name ="GetProduct")]
-        //[ProducesResponseType(typeof(Product),(int)HttpStatusCode.OK)]
-        //[ProducesResponseType((int)HttpStatusCode.NotFound)]
-        //[ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        //public async Task<ActionResult> GetProductById(string id)
-        //{
-        //    var result = await _repository.GetProductByIdAsync(id);
-        //    if(result.IsSuccess)
-        //        return Ok(result.Product);
-        //    if(result.errorType==ErrorType.NotFound)
-        //        return NotFound();
-        //    return BadRequest(ErrorMessage);
-        //}
+        
     }
 }
