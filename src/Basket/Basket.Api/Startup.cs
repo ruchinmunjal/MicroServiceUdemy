@@ -3,10 +3,13 @@ using Basket.Api.Data.Interfaces;
 using Basket.Api.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
+using System;
 
 namespace Basket.Api
 {
@@ -27,8 +30,17 @@ namespace Basket.Api
                 var configuration = ConfigurationOptions.Parse(Configuration.GetConnectionString("Redis"), true);
                 return ConnectionMultiplexer.Connect(configuration);
             });
-            services.AddTransient<IBasketContext,BasketContext>();
-            services.AddTransient<IBasketRepository,BasketRepository>();
+            services.AddTransient<IBasketContext, BasketContext>();
+            services.AddTransient<IBasketRepository, BasketRepository>();
+            services.AddApiVersioning(apiVerConfig =>
+                                            {
+                                                apiVerConfig.AssumeDefaultVersionWhenUnspecified = true;
+                                                apiVerConfig.DefaultApiVersion = new ApiVersion(new DateTime(2020, 6, 6));
+                                            });
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Basket Api", Version = "v1" });
+            });
             services.AddControllers();
         }
 
@@ -47,6 +59,11 @@ namespace Basket.Api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Basket Api v1");
             });
         }
     }
