@@ -8,6 +8,11 @@ services:
           - ${WEBAPP_STORAGE_HOME}/site:/data/db
         ports:
           - "27017:27017"
+    basket_db:
+        container_name: basket.db
+        restart: always        
+        ports:
+          - "6379:6379"
     catalog.api:
         environment:
           - ASPNETCORE_ENVIRONMENT=Development
@@ -16,6 +21,17 @@ services:
           - catalog_db
         volumes:
           - ${HOME}/.microsoft/usersecrets/:/root/.microsoft/usersecrets
-        #  - ${HOME}/.aspnet/https:/root/.aspnet/https/
+          - ${HOME}/.aspnet/https:/root/.aspnet/https/
         ports:
           - "8000:80"
+    basket.api:
+        environment:
+          - ASPNETCORE_ENVIRONMENT=Development
+          - "ConnectionStrings:Redis=basket_db:6379"
+        depends_on:
+          - basket_db
+        volumes:
+          - ${HOME}/.microsoft/usersecrets/:/root/.microsoft/usersecrets
+          - ${HOME}/.aspnet/https:/root/.aspnet/https/
+        ports:
+          - "8001:80"
