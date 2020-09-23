@@ -10,6 +10,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 using System;
+using AutoMapper;
+using RabbitMQ.Client;
+using ServiceBus.Producer;
+using IRabbitMqConnection = ServiceBus.IRabbitMqConnection;
 
 namespace Basket.Api
 {
@@ -18,6 +22,7 @@ namespace Basket.Api
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            
         }
 
         public IConfiguration Configuration { get; }
@@ -42,6 +47,25 @@ namespace Basket.Api
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Basket Api", Version = "v1" });
             });
             services.AddControllers();
+            services.AddAutoMapper(typeof(Startup));
+            
+            services.AddSingleton<IRabbitMqConnection>(provider =>
+            {
+                var factory = new ConnectionFactory()
+               {
+                   HostName = Configuration["EventBus:HostName"],
+               };
+                if (!string.IsNullOrEmpty(Configuration["EventBus:UserName"]))
+                {
+                    factory.UserName = Configuration["EventBus:UserName"];
+                }
+                if (!string.IsNullOrEmpty(Configuration["EventBus:Password"]))
+                {
+                    factory.Password = Configuration["EventBus:Password"];
+                }
+                return new ServiceBus.RabbitMqConnection(factory);
+            });
+            services.AddSingleton<BasketCheckoutProducer>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
