@@ -20,13 +20,13 @@ namespace Basket.Api.Controllers
         private readonly IBasketRepository _basketRepository;
         private readonly IMapper _mapper;
         private readonly BasketCheckoutProducer _eventProducer;
-        private readonly ILogger _logger;
-        public BasketController(IBasketRepository basketRepository,IMapper mapper, BasketCheckoutProducer eventProducer, ILogger logger)
+        
+        public BasketController(IBasketRepository basketRepository,IMapper mapper, BasketCheckoutProducer eventProducer)
         {
             this._basketRepository = basketRepository;
             _mapper = mapper;
             _eventProducer = eventProducer;
-            _logger = logger;
+            
         }
 
         [HttpGet("{username}")]
@@ -88,7 +88,6 @@ namespace Basket.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.Log(LogLevel.Error,e,"Error connecting to the queue");
                 return BadRequest("Unable to process the request");
             }
             return Accepted("Order Placed");
