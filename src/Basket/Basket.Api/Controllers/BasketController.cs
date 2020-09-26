@@ -66,7 +66,6 @@ namespace Basket.Api.Controllers
 
         }
         [HttpPost]
-        [Route("action")]
         [ProducesResponseType((int)HttpStatusCode.Accepted)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<ActionResult> CheckoutBasket([FromBody] BasketCheckout basketCheckout)
@@ -77,7 +76,7 @@ namespace Basket.Api.Controllers
                 return BadRequest("Couldn't find the cart");
                 
             }
-            await _basketRepository.DeleteCartAsync(basketCheckout.UserName);
+            
             var eventMessage = _mapper.Map<BasketCheckoutEvent>(basketCheckout);
             eventMessage.RequestId = Guid.NewGuid();
             eventMessage.TotalPrice = basket.TotalPrice;
@@ -90,6 +89,7 @@ namespace Basket.Api.Controllers
             {
                 return BadRequest("Unable to process the request");
             }
+            await _basketRepository.DeleteCartAsync(basketCheckout.UserName);
             return Accepted("Order Placed");
         }
         
